@@ -192,12 +192,11 @@ Open **http://localhost:8501** in your browser.
 1. Push this repository to GitHub (if not already done).
 2. Go to [share.streamlit.io](https://share.streamlit.io/) and sign up/log in.
 3. Click "New app", select your repository, branch, and set the main file path to `app.py`.
-4. Under "Advanced settings", set the Python version to 3.10 (or leave default).
+4. Under "Advanced settings", set the Python version to **3.11**.
 5. Add a secret named `GROQ_API_KEY` with your Groq API key.
 6. Click "Deploy!". The app will build and deploy automatically.
    - The FAISS index will be built on first startup (takes about 60 seconds).
 
----
 
 ## Dataset
 
