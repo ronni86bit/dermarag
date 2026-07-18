@@ -9,6 +9,7 @@ and generating grounded explanations using Groq's Llama3 model.
 
 import streamlit as st
 import os
+import tempfile
 from pathlib import Path
 from PIL import Image
 import numpy as np
@@ -18,7 +19,7 @@ from model.inference import predict_image
 from rag.retriever import retrieve
 from rag.generator import generate_explanation
 
-# Auto-build FAISS index on first startup (required for HF Spaces)
+# Auto-build FAISS index on first startup (required for Streamlit Community Cloud)
 from pathlib import Path as _Path
 import subprocess as _subprocess
 
@@ -224,7 +225,7 @@ def main():
             temp_paths = []
             for uploaded_file in uploaded_files:
                 # Create a temporary file
-                temp_path = f"/tmp/{uploaded_file.name}"
+                temp_path = os.path.join(tempfile.gettempdir(), uploaded_file.name)
                 with open(temp_path, "wb") as f:
                     f.write(uploaded_file.getbuffer())
                 temp_paths.append(temp_path)

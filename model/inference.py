@@ -8,6 +8,8 @@ It loads a pre-trained model (with ImageNet weights) and provides prediction fun
 The model architecture follows a Siamese network with three branches (for up to three images),
 each branch being an EfficientNetB0 with global average pooling, followed by a shared dense
 head for classification into 25 skin condition classes.
+
+If trained weights are available locally, they are loaded to improve accuracy.
 """
 
 import os
@@ -67,11 +69,16 @@ def load_model() -> Model:
         name='dermarag_siamese_efficientnet'
     )
 
-    # In a real scenario, we would load pre-trained weights here
-    # For now, we return the model with random ImageNet weights for the base
-    # and random weights for the head (to be replaced with actual training)
-    # In production, you would load weights from a checkpoint:
-    # model.load_weights('path/to/model_weights.h5')
+    # Load trained weights if available
+    weights_path = os.path.join(os.path.dirname(__file__), 'dermal_weights.h5')
+    if os.path.exists(weights_path):
+        try:
+            model.load_weights(weights_path)
+            print(f"Loaded custom weights from {weights_path}")
+        except Exception as e:
+            print(f"Warning: Could not load weights from {weights_path}: {e}")
+    else:
+        print("No custom weights found. Using ImageNet weights for base and random weights for head.")
 
     return model
 

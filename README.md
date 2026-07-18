@@ -1,25 +1,13 @@
----
-title: DermaRAG
-emoji: 🩺
-colorFrom: blue
-colorTo: purple
-sdk: streamlit
-sdk_version: 1.28.0
-app_file: app.py
-pinned: false
----
-
 # 🩺 DermaRAG — AI-Powered Skin Condition Assistant
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.13+-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
-[![HuggingFace](https://img.shields.io/badge/🤗%20HuggingFace-Spaces-yellow)](https://huggingface.co/spaces/ronni86bit/dermarag)
 
 > A multimodal RAG pipeline combining EfficientNetB0 image classification with FAISS vector search and Groq LLaMA 3 to provide grounded, cited explanations for skin conditions.
 
-🚀 **[Live Demo → huggingface.co/spaces/ronni86bit/dermarag](https://huggingface.co/spaces/ronni86bit/dermarag)**
+🚀 **[Live Demo → Share at streamlit.io/cloud](https://dermarag.streamlit.app)** (to be deployed)
 
 ---
 
@@ -80,8 +68,8 @@ The system was built as an extension of the SCIN skin disease prediction researc
 - **FAISS semantic retrieval** — fast approximate nearest-neighbor search over embedded clinical text
 - **Hallucination-resistant generation** — LLaMA 3 answers only from retrieved context, never from memory
 - **Source citations** — every generated response cites [1][2][3] with source URLs
-- **Auto-builds index** — FAISS index builds automatically on first Hugging Face Spaces startup
-- **CPU-only deployment** — runs on HF free tier, no GPU required
+- **Auto-builds index** — FAISS index builds automatically on first Streamlit Community Cloud startup
+- **CPU-only deployment** — runs on Streamlit Community Cloud, no GPU required
 - **Medical disclaimer** — prominent on every response
 
 ---
@@ -125,12 +113,13 @@ Results from the SCIN dataset (5,033 real-world dermatology cases, 25 conditions
 | Embeddings | sentence-transformers/all-MiniLM-L6-v2 |
 | LLM | Groq LLaMA 3 (llama3-8b-8192) |
 | Frontend | Streamlit |
-| Deployment | Hugging Face Spaces (free tier) |
+| Deployment | Streamlit Community Cloud |
 | Dataset | Google SCIN (5,033 dermatology cases) |
 
 ---
 
 ## Project Structure
+
 dermarag/
  ├── app.py # Main Streamlit application
  ├── model/
@@ -198,14 +187,15 @@ Open **http://localhost:8501** in your browser.
 
 ---
 
-## Deployment on Hugging Face Spaces
+## Deployment on Streamlit Community Cloud
 
-1. Fork this repo
-2. Go to [huggingface.co/spaces](https://huggingface.co/spaces) → New Space
-3. Select **Streamlit** as SDK, connect your GitHub repo
-4. Go to Space **Settings → Variables and Secrets**
-5. Add secret: `GROQ_API_KEY` = your Groq API key
-6. The Space builds automatically — FAISS index is built on first startup (~60 seconds)
+1. Push this repository to GitHub (if not already done).
+2. Go to [share.streamlit.io](https://share.streamlit.io/) and sign up/log in.
+3. Click "New app", select your repository, branch, and set the main file path to `app.py`.
+4. Under "Advanced settings", set the Python version to 3.10 (or leave default).
+5. Add a secret named `GROQ_API_KEY` with your Groq API key.
+6. Click "Deploy!". The app will build and deploy automatically.
+   - The FAISS index will be built on first startup (takes about 60 seconds).
 
 ---
 
@@ -223,17 +213,17 @@ Dataset: [github.com/google-research-datasets/scin](https://github.com/google-re
 
 ## Limitations
 
-- **Proxy model weights** — uses ImageNet-pretrained EfficientNetB0 as feature extractor; replace with trained weights from the SCIN study for production accuracy
+- **Model weights** — uses ImageNet-pretrained EfficientNetB0 as feature extractor; loads custom weights from model/dermal_weights.h5 if available, otherwise uses random weights for the classification head. For production, replace with trained weights from the SCIN study.
 - **Sample knowledge base** — `dermatology_kb.csv` contains sample clinical text; expand with a full PubMed API scrape for production
 - **Not a medical device** — outputs are educational only, not clinical diagnoses
-- **CPU inference** — slower than GPU; ~5–10 seconds per analysis on HF free tier
+- **CPU inference** — slower than GPU; ~5–10 seconds per analysis on Streamlit Community Cloud
 - **25 conditions only** — limited to conditions present in the SCIN dataset
 
 ---
 
 ## Future Improvements
 
-- Upload trained model weights to HF Model Hub
+- Upload trained model weights to Hugging Face Model Hub (optional)
 - Expand knowledge base with full PubMed API scrape (free, no key needed)
 - Add Grad-CAM visualization to highlight which image regions influenced prediction
 - MLOps pipeline for model versioning and monitoring (MLflow + Docker)

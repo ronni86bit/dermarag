@@ -21,16 +21,27 @@ logger = logging.getLogger(__name__)
 
 def configure_groq() -> Groq:
     """
-    Configure the Groq client with the API key from environment variables.
+    Configure the Groq client with the API key from environment variables or Streamlit secrets.
 
     Returns:
         Groq: Configured Groq client
     """
-    api_key = os.getenv('GROQ_API_KEY')
+    api_key = None
+    # Try to get from Streamlit secrets if available
+    try:
+        import streamlit as st
+        if hasattr(st, 'secrets') and 'GROQ_API_KEY' in st.secrets:
+            api_key = st.secrets['GROQ_API_KEY']
+    except ImportError:
+        pass  # Streamlit not available
+
+    # If not found in secrets, try environment variable
+    if not api_key:
+        api_key = os.getenv('GROQ_API_KEY')
+
     if not api_key:
         raise ValueError(
-            "GROQ_API_KEY environment variable not set. "
-            "Please set it in your .env file or environment."
+            "GROQ_API_KEY not found. Please set it in your .env file or Streamlit secrets."
         )
     return Groq(api_key=api_key)
 
