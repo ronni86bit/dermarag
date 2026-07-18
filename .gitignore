@@ -1,0 +1,14 @@
+.env
+index/faiss.index
+index/metadata.json
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+*.h5
+*.pt
+*.keras
+/tmp/
+.DS_Store
+Thumbs.db
