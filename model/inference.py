@@ -70,19 +70,23 @@ def load_model() -> Model:
     )
 
     # Load trained weights if available
-    weights_path = os.path.join(os.path.dirname(__file__), 'dermal_weights.h5')
-    if os.path.exists(weights_path):
+    weights_path_h5 = os.path.join(os.path.dirname(__file__), 'dermal_weights.h5')
+    weights_path_keras = os.path.join(os.path.dirname(__file__), 'dermal_weights.keras')
+    weights_path = None
+    if os.path.exists(weights_path_keras):
+        weights_path = weights_path_keras
+    elif os.path.exists(weights_path_h5):
+        weights_path = weights_path_h5
+    if weights_path:
         try:
             model.load_weights(weights_path)
-            print(f"Loaded custom weights from {weights_path}")
+            print(f'Loaded custom weights from {weights_path}')
         except Exception as e:
-            print(f"Warning: Could not load weights from {weights_path}: {e}")
+            print(f'Warning: Could not load weights from {weights_path}: {e}')
     else:
-        print("No custom weights found. Using ImageNet weights for base and random weights for head.")
+        print('No custom weights found. Using ImageNet weights for base and random weights for head.')
 
     return model
-
-
 def preprocess_image(image_path: str) -> np.ndarray:
     """
     Preprocess a single image for model input.
@@ -133,14 +137,8 @@ def predict_image(image_paths: List[str]) -> List[Tuple[str, float]]:
     # Get class names (should match training order)
     # In a real implementation, this would come from training metadata
     class_names = [
-        'Acne', 'Actinic Keratosis', 'Basal Cell Carcinoma', 'Benign Keratosis',
-        'Dermatofibroma', 'Eczema', 'Fungal Infection', 'Glomus Tumor',
-        'Hair Disorders', 'Haemangioma', 'Hyperhidrosis', 'Infected Wound',
-        'Lichen Planus', 'Lupus Erythematosus', 'Melanoma', 'Molluscum Contagiosum',
-        'Mycetoma', 'Nail Disorders', 'Papillomatosis', 'Psoriasis',
-        'Seborrheic Keratosis', 'Syphilis', 'Systemic Lupus Erythematosus',
-        'Vasculitis', 'Vitiligo'
-    ]
+    'Acne', 'Actinic Keratosis', 'Atopic Dermatitis', 'Basal Cell Carcinoma', 'Contact Dermatitis', 'Eczema', 'Folliculitis', 'Fungal Infection', 'Herpes Zoster', 'Hyperpigmentation', 'Impetigo', 'Keloid', 'Lichen Planus', 'Melanoma', 'Molluscum Contagiosum', 'Nail Disease', 'Psoriasis', 'Rosacea', 'Seborrheic Dermatitis', 'Seborrheic Keratosis', 'Squamous Cell Carcinoma', 'Tinea', 'Urticaria', 'Vitiligo', 'Warts'
+]
 
     # Get top 3 predictions
     top_indices = np.argsort(predictions)[::-1][:3]
