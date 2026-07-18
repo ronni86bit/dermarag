@@ -22,14 +22,17 @@ from rag.generator import generate_explanation
 # Auto-build FAISS index on first startup (required for Streamlit Community Cloud)
 from pathlib import Path as _Path
 import subprocess as _subprocess
+import sys
 
 _INDEX_PATH = _Path("index/faiss.index")
 _METADATA_PATH = _Path("index/metadata.json")
 
 if not _INDEX_PATH.exists() or not _METADATA_PATH.exists():
-    import streamlit as st
     with st.spinner("🔨 Building knowledge base for first time... (~60 seconds)"):
-        _subprocess.run(["python", "rag/build_index.py"], check=True)
+        _subprocess.run(
+            [sys.executable, "rag/build_index.py"],
+            check=True
+        )
     st.success("✅ Knowledge base ready!")
     st.rerun()
 st.set_page_config(
