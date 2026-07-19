@@ -15,24 +15,28 @@ The architecture matches the one used in the notebook:
 import os
 from typing import List, Tuple
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras.applications.efficientnet import preprocess_input
-from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Input, Lambda, Add, Multiply
-from tensorflow.keras.models import Model
-import streamlit as st
 
 
-def build_effnet_siamese_model(num_classes: int) -> Model:
+def build_model(num_classes: int):
     """
-    Build the Siamese EfficientNetB0 model with feature extraction and classification head.
+    Build the Siamese EfficientNetB0 model architecture (without loading weights).
     This mirrors the architecture from the SCIN_Model notebook.
 
     Args:
         num_classes: Number of output classes.
 
     Returns:
-        tf.keras.Model: The constructed model.
+        tf.keras.Model: The constructed model (with random weights).
     """
+    try:
+        import tensorflow as tf
+        from tensorflow.keras.applications.efficientnet import preprocess_input
+        from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Input, Lambda, Add, Multiply
+        from tensorflow.keras.models import Model
+    except ImportError as e:
+        print(f"Failed to import TensorFlow: {e}")
+        raise
+
     IMG_SIZE = 224
 
     # Define three input branches
@@ -101,32 +105,30 @@ def build_effnet_siamese_model(num_classes: int) -> Model:
     return model
 
 
-@st.cache_resource
-def load_model() -> Model:
+def load_model() -> object:
     """
     Load and cache the Siamese EfficientNetB0 model with pre-trained weights.
 
     Returns:
-        tf.keras.Model: The loaded model ready for inference.
+        The loaded model ready for inference.
     """
+    try:
+        import tensorflow as tf
+    except ImportError as e:
+        print(f"Failed to import TensorFlow: {e}")
+        raise
+
     # Number of classes determined from the SCIN dataset after filtering
     num_classes = 41  # As computed from the notebook after removing classes with <30 instances
 
     # Build the model architecture
-    model = build_effnet_siamese_model(num_classes)
+    model = build_model(num_classes)
 
     # Define paths to the weights file
-    weights_path_h5 = os.path.join(os.path.dirname(__file__), 'model_checkpoints', 'custom_siamese.weights.h5')
-    weights_path_keras = os.path.join(os.path.dirname(__file__), 'model_checkpoints', 'custom_siamese.weights.keras')
+    weights_path = os.path.join(os.path.dirname(__file__), 'checkpoints', 'custom_siamese.weights.h5')
 
-    # Check for weights file (prefer .keras if exists, else .h5)
-    weights_path = None
-    if os.path.exists(weights_path_keras):
-        weights_path = weights_path_keras
-    elif os.path.exists(weights_path_h5):
-        weights_path = weights_path_h5
-
-    if weights_path:
+    # Check for weights file
+    if os.path.exists(weights_path):
         try:
             model.load_weights(weights_path)
             print(f'Loaded custom weights from {weights_path}')
@@ -155,6 +157,13 @@ def preprocess_image(image_path: str) -> np.ndarray:
         # Return a zero array of the correct shape for missing images
         return np.zeros((1, 224, 224, 3), dtype=np.float32)
 
+    try:
+        import tensorflow as tf
+        from tensorflow.keras.applications.efficientnet import preprocess_input
+    except ImportError as e:
+        print(f"Failed to import TensorFlow for preprocessing: {e}")
+        raise
+
     # Load image
     img = tf.keras.preprocessing.image.load_img(
         image_path, target_size=(224, 224)
@@ -176,11 +185,16 @@ def predict_image(image_paths: List[str]) -> List[Tuple[str, float]]:
     Returns:
         List of tuples (condition_name, confidence) sorted by confidence descending.
     """
+    try:
+        import tensorflow as tf
+    except ImportError as e:
+        print(f"Failed to import TensorFlow for prediction: {e}")
+        raise
+
     # Load the model
     model = load_model()
 
     # Prepare inputs (always 3 images, missing ones are empty strings)
-    # We will preprocess each image to get a tensor of shape (1, 224, 224, 3)
     inputs = []
     for i in range(3):
         if i < len(image_paths):
