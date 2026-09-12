@@ -155,7 +155,7 @@ def main():
         for idx, uploaded_file in enumerate(uploaded_files):
             with cols[idx]:
                 image = Image.open(uploaded_file)
-                st.image(image, caption=f"Image {idx+1}", use_column_width=True)
+                st.image(image, caption=f"Image {idx+1}", use_container_width=True)
 
     # Analyze button
     analyze_button = st.button(
